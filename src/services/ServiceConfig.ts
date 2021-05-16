@@ -1,0 +1,1 @@
+export const MongoClient_Config = { useNewUrlParser: true, useUnifiedTopology: true };
