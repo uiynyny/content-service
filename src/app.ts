@@ -1,32 +1,39 @@
-import dotenv from "dotenv";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 
-import MongoDAO from "./services/MongoDAO";
 import MasterRouter from "./routers/masterRouter";
+import ContentController from "./controllers/ContentController";
+import fs from 'fs';
 
-dotenv.config({
-    path: '.env'
-});
+export default class App {
+    public express: express.Application;
+    public contentController: ContentController;
 
+    private swaggerData: any = fs.readFileSync(__dirname + '/swagger/swagger.json', 'utf8');
+    private customCss: any = fs.readFileSync(__dirname + '/swagger/swagger.css', 'utf8');
+    private swaggerDocument = JSON.parse(this.swaggerData);
 
-class Server {
-    public app = express();
-    public router = new MasterRouter().router;
-    public db = new MongoDAO();
-    public async start() {
-        await this.db.init();
+    constructor() {
+        this.express = express();
+        this.middleware();
+        this.routes();
+    }
+
+    private middleware(): void {
+        if (process.env.NODE_ENV !== 'production') {
+            const morgan = require('morgan');
+            this.express.use(morgan('tiny'))
+        }
+        this.express.use(express.json());
+        this.express.use(express.urlencoded({ extended: true }));
+    }
+
+    private routes(): void {
+        const default_route = '/naka/v0';
+        this.express.use(default_route, new MasterRouter().router);
+        this.express.use('/api/docs', swaggerUi.serve, swaggerUi.setup(this.swaggerDocument, {}, {}, this.customCss));
+        this.express.use('*', (req, res) => {
+            res.status(404).json({ message: 'source not found' });
+        })
     }
 }
-const server = new Server();
-server.start();
-
-if (process.env.NODE_ENV !== 'production') {
-    const morgan = require('morgan');
-    server.app.use(morgan('tiny'))
-}
-const default_route = '/naka/v0';
-server.app.use(default_route, server.router);
-
-((port = process.env.APP_PORT || 5000) => {
-    server.app.listen(port, () => console.log(`> http://localhost:${port}`));
-})();

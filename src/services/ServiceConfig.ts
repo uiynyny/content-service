@@ -1,1 +1,6 @@
-export const MongoClient_Config = { useNewUrlParser: true, useUnifiedTopology: true };
+export const MongoClient_Config = {
+    useNewUrlParser: true,
+    useFindAndModify: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+}

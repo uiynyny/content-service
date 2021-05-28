@@ -1,24 +1,25 @@
-import { Collection, Db, MongoClient } from "mongodb";
+import Mongoose from 'mongoose';
 import { MongoClient_Config } from "./ServiceConfig";
-
-const uri = process.env.MONGO_URI;
-const db_name = process.env.MONGO_DB_NAME;
-const conf = MongoClient_Config;
+import { APILogger } from "../logger/APILogger";
 
 export default class MongoDAO {
-    private _client;
-    private _db;
-    private _Content;
-
+    private _db: Mongoose.Connection;
+    private _logger: APILogger;
+    
     constructor() {
-        this._client = new MongoClient(uri!, conf);
-    }
+        const db_name = process.env.DB_NAME;
+        const uri = process.env.MONGO_URI;
+        const conf = MongoClient_Config;
+        Mongoose.connect(uri?.replace('\${db_name}', db_name as string)!, conf);
+        this._logger = new APILogger();
+        this._db = Mongoose.connection;
 
-    public async init() {
-        await this._client.connect();
-        console.log('connected');
-        let db_name = process.env.MONGO_DB_NAME;
-        this._db = this._client.db(db_name);
-        this._Content = new Content(this._db);
+        this._db.once("open", async () => {
+            this._logger.info('connected to database', null);
+        });
+    
+        this._db.on("error", () => {
+            console.error("Error connecting to database",null);
+        });
     }
 }
