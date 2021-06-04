@@ -13,12 +13,16 @@ export default class ContentController {
         return { text: `You've reached the ${this.constructor.name} default method` };
     }
 
-    async getContents(): Promise<IContent[]> {
-        return this._contentService.getContents();
+    async getContents(skip: number): Promise<IContent[]> {
+        return this._contentService.getContents(skip);
     }
 
-    async getContentsByUsername(username: string) {
-        return this._contentService.getContentsByUsername(username);
+    async getContentsByUsername(username: string, skip: number) {
+        return this._contentService.getContentsByUsername(username, skip);
+    }
+
+    async getContentsByLocation(longitude: number, latitude: number, radius: number){
+        return this._contentService.getContentsByLocation(longitude,latitude,radius);
     }
 
     async createContent(content: IContent) {

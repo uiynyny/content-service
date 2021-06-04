@@ -34,8 +34,10 @@ const ContentSchema: Schema = new Schema({
     imageUrls: { type: [String], required: false },
     reply: { type: [ReplySchema], required: false },
     like: { type: Number, default: 0 },
-    geolocation: { type: { lat: Number, lng: Number }, required: true },
+    geolocation: {
+        type: { type: String, enum: ['Point'], required: true },
+        coordinates: { type: [Number], required: true }
+    },
 });
-
 
 export const ContentModel: Model<IContent> = model<IContent>('content', ContentSchema);

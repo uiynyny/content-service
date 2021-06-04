@@ -9,12 +9,16 @@ export default class ContentService {
         this._contentRepo = new ContentRepository();
     }
 
-    async getContents():Promise<IContent[]> {
-        return this._contentRepo.getContent();
+    async getContents(skip: number): Promise<IContent[]> {
+        return this._contentRepo.getContent(skip);
     }
 
-    async getContentsByUsername(username:string): Promise<IContent[]>{
-        return this._contentRepo.getContentsByUsername(username);
+    async getContentsByUsername(username: string, skip: number): Promise<IContent[]> {
+        return this._contentRepo.getContentsByUsername(username, skip);
+    }
+    
+    async getContentsByLocation(longitude: number, latitude: number, radius: number){
+        return this._contentRepo.getContentsByLocation(longitude, latitude, radius);
     }
 
     async createContent(content: IContent) {
@@ -25,7 +29,7 @@ export default class ContentService {
         return this._contentRepo.updateContent(content);
     }
 
-    async deleteContent(contentId:string) {
+    async deleteContent(contentId: string) {
         return this._contentRepo.deleteContent(contentId);
     }
 }
