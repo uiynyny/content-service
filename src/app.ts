@@ -9,10 +9,6 @@ export default class App {
     public express: express.Application;
     public contentController: ContentController;
 
-    private swaggerData: any = fs.readFileSync(__dirname + '/swagger/swagger.json', 'utf8');
-    private customCss: any = fs.readFileSync(__dirname + '/swagger/swagger.css', 'utf8');
-    private swaggerDocument = JSON.parse(this.swaggerData);
-
     constructor() {
         this.express = express();
         this.middleware();
@@ -31,7 +27,6 @@ export default class App {
     private routes(): void {
         const default_route = '/naka/v0';
         this.express.use(default_route, new MasterRouter().router);
-        this.express.use('/api/docs', swaggerUi.serve, swaggerUi.setup(this.swaggerDocument, {}, {}, this.customCss));
         this.express.use('*', (req, res) => {
             res.status(404).json({ message: 'source not found' });
         })
